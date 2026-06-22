@@ -1,216 +1,204 @@
-import type { CSSProperties } from 'react'
+import { Pressable, Text, useWindowDimensions, View } from 'react-native'
+import { BreathingHalo } from '../components/BreathingHalo'
+import { MicIcon } from '../icons'
+import { META, ORDER } from '../data'
+import { colors, fonts } from '../theme'
 import type { ContextId } from '../types'
-import { MicIcon } from '../components/icons'
 
-interface BubbleVM {
-  id: ContextId
-  label: string
-  count: number
-  emphasis: boolean
-  style: CSSProperties
-  open: () => void
-}
+const FIELD_W = 346
+const FIELD_H = 384
 
-interface NextUpVM {
-  has: boolean
+export interface NextUp {
   text: string
   trigger: string
-  done: () => void
+  onDone: () => void
 }
 
-interface HomeScreenProps {
-  hasNotifWaiting: boolean
-  openNotif: () => void
-  nextUp: NextUpVM
-  contexts: BubbleVM[]
+interface Props {
+  topInset: number
+  alertsCount: number
+  onOpenAlerts: () => void
+  nextUp: NextUp | null
+  counts: Record<ContextId, number>
   totalCount: number
-  openCapture: () => void
-}
-
-const glowStyle: CSSProperties = {
-  position: 'absolute',
-  left: '50%',
-  top: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 90,
-  height: 90,
-  borderRadius: '50%',
-  background: 'rgba(167,216,182,0.16)',
-  animation: 'breathe 4s ease-in-out infinite',
+  onOpenContext: (id: ContextId) => void
+  onOpenCapture: () => void
 }
 
 export function HomeScreen({
-  hasNotifWaiting,
-  openNotif,
+  topInset,
+  alertsCount,
+  onOpenAlerts,
   nextUp,
-  contexts,
+  counts,
   totalCount,
-  openCapture,
-}: HomeScreenProps) {
+  onOpenContext,
+  onOpenCapture,
+}: Props) {
+  const { width } = useWindowDimensions()
+  const avail = width - 44
+  const scale = Math.min(1, avail / FIELD_W)
+
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '70px 22px 44px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div
-          style={{
-            fontSize: 12,
-            letterSpacing: 2,
-            textTransform: 'uppercase',
-            color: '#7E8A84',
-            fontWeight: 700,
-          }}
-        >
-          Cerca de ti
-        </div>
-        {hasNotifWaiting && (
-          <div
-            onClick={openNotif}
+    <View style={{ flex: 1, paddingHorizontal: 22, paddingTop: topInset + 16, paddingBottom: 44 }}>
+      {/* header */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Text style={{ fontSize: 12, letterSpacing: 2, color: colors.muted2, fontFamily: fonts.sansBold }}>
+          CERCA DE TI
+        </Text>
+        {alertsCount > 0 && (
+          <Pressable
+            onPress={onOpenAlerts}
             style={{
-              display: 'flex',
+              flexDirection: 'row',
               alignItems: 'center',
               gap: 7,
-              background: 'rgba(167,216,182,0.12)',
-              border: '1px solid rgba(167,216,182,0.25)',
-              color: '#A7D8B6',
+              backgroundColor: colors.greenSoft12,
+              borderWidth: 1,
+              borderColor: colors.greenBorder25,
               borderRadius: 999,
-              padding: '6px 12px',
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: 'pointer',
+              paddingVertical: 6,
+              paddingHorizontal: 12,
             }}
           >
-            <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#A7D8B6' }} />1 aviso
-          </div>
+            <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors.green }} />
+            <Text style={{ color: colors.green, fontSize: 12, fontFamily: fonts.sansSemi }}>
+              {alertsCount} aviso{alertsCount > 1 ? 's' : ''}
+            </Text>
+          </Pressable>
         )}
-      </div>
+      </View>
 
       {/* next-up banner */}
-      {nextUp.has && (
-        <div
+      {nextUp && (
+        <View
           style={{
             marginTop: 16,
-            position: 'relative',
-            border: '1.5px solid rgba(167,216,182,0.4)',
-            background: 'rgba(167,216,182,0.08)',
+            borderWidth: 1.5,
+            borderColor: colors.greenBorder40,
+            backgroundColor: colors.greenSoft08,
             borderRadius: 22,
-            padding: '18px 18px',
-            display: 'flex',
+            padding: 18,
+            flexDirection: 'row',
             alignItems: 'center',
             gap: 14,
-            overflow: 'hidden',
           }}
         >
-          <div style={{ flex: 1 }}>
-            <div
-              style={{
-                fontSize: 11,
-                letterSpacing: 1.5,
-                textTransform: 'uppercase',
-                color: '#A7D8B6',
-                fontWeight: 700,
-              }}
-            >
-              Ahora cerca · {nextUp.trigger}
-            </div>
-            <div
-              style={{
-                fontFamily: "'Newsreader', serif",
-                fontStyle: 'italic',
-                fontSize: 25,
-                lineHeight: 1.1,
-                marginTop: 5,
-                color: '#EAF6EE',
-              }}
-            >
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 11, letterSpacing: 1, color: colors.green, fontFamily: fonts.sansBold }}>
+              AHORA CERCA · {nextUp.trigger.toUpperCase()}
+            </Text>
+            <Text style={{ fontFamily: fonts.serifItalic, fontSize: 25, color: colors.greenTextHi, marginTop: 5 }}>
               {nextUp.text}
-            </div>
-          </div>
-          <div
-            onClick={nextUp.done}
+            </Text>
+          </View>
+          <Pressable
+            onPress={nextUp.onDone}
             style={{
               width: 46,
               height: 46,
-              borderRadius: '50%',
-              background: '#A7D8B6',
-              display: 'flex',
+              borderRadius: 23,
+              backgroundColor: colors.green,
               alignItems: 'center',
               justifyContent: 'center',
-              flexShrink: 0,
-              cursor: 'pointer',
-              boxShadow: '0 6px 16px rgba(167,216,182,0.3)',
             }}
           >
-            <span
+            <View
               style={{
-                display: 'block',
                 width: 16,
                 height: 9,
-                borderLeft: '3px solid #11161A',
-                borderBottom: '3px solid #11161A',
-                transform: 'rotate(-45deg) translate(1px,-2px)',
+                borderLeftWidth: 3,
+                borderBottomWidth: 3,
+                borderColor: colors.greenInk,
+                transform: [{ rotate: '-45deg' }, { translateY: -1 }],
               }}
             />
-          </div>
-        </div>
+          </Pressable>
+        </View>
       )}
 
       {/* bubble field */}
-      <div style={{ position: 'relative', flex: 1, marginTop: 18, minHeight: 380 }}>
-        {contexts.map((ctx) => (
-          <div key={ctx.id} onClick={ctx.open} style={ctx.style}>
-            {ctx.emphasis && <span style={glowStyle} />}
-            <div
-              style={{
-                fontFamily: "'Newsreader', serif",
-                fontStyle: 'italic',
-                fontSize: 28,
-                lineHeight: 1,
-                position: 'relative',
-                color: '#EAECEA',
-              }}
-            >
-              {ctx.count}
-            </div>
-            <div style={{ fontSize: 13, color: '#9AA39E', marginTop: 3, position: 'relative' }}>
-              {ctx.label}
-            </div>
-          </div>
-        ))}
-      </div>
+      <View style={{ flex: 1, marginTop: 18, justifyContent: 'center' }}>
+        <View style={{ height: FIELD_H * scale, width: '100%' }}>
+          <View
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: FIELD_W,
+              height: FIELD_H,
+              transform: [{ scale }],
+              transformOrigin: 'top left',
+            }}
+          >
+            {ORDER.map((id) => {
+              const meta = META[id]
+              const emphasis = !!meta.emphasis
+              return (
+                <Pressable
+                  key={id}
+                  onPress={() => onOpenContext(id)}
+                  style={{
+                    position: 'absolute',
+                    top: meta.top,
+                    left: meta.left,
+                    width: meta.size,
+                    height: meta.size,
+                    borderRadius: meta.size / 2,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    borderWidth: emphasis ? 1.5 : 1,
+                    borderColor: emphasis ? colors.green : 'rgba(255,255,255,0.11)',
+                    backgroundColor: emphasis ? colors.greenSoft10 : colors.surface,
+                  }}
+                >
+                  {emphasis && <BreathingHalo size={90} color="rgba(167,216,182,0.16)" />}
+                  <Text style={{ fontFamily: fonts.serifItalic, fontSize: 28, color: colors.text }}>
+                    {counts[id]}
+                  </Text>
+                  <Text style={{ fontSize: 13, color: colors.muted, marginTop: 3 }}>{meta.label}</Text>
+                </Pressable>
+              )
+            })}
+          </View>
+        </View>
+      </View>
 
-      <div style={{ textAlign: 'center', fontSize: 13, color: '#6E7873', margin: '4px 0 14px' }}>
+      <Text style={{ textAlign: 'center', fontSize: 13, color: colors.muted3, marginVertical: 10 }}>
         {totalCount} recordatorios viven en 5 lugares
-      </div>
+      </Text>
 
       {/* capture bar */}
-      <div
-        onClick={openCapture}
+      <Pressable
+        onPress={onOpenCapture}
         style={{
-          display: 'flex',
+          flexDirection: 'row',
           alignItems: 'center',
           gap: 12,
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          backgroundColor: colors.surfaceHi,
+          borderWidth: 1,
+          borderColor: colors.hairline,
           borderRadius: 18,
-          padding: '12px 12px 12px 18px',
-          cursor: 'pointer',
+          paddingVertical: 12,
+          paddingLeft: 18,
+          paddingRight: 12,
         }}
       >
-        <span style={{ flex: 1, color: '#7E8A84', fontSize: 16 }}>Anota algo en un susurro…</span>
-        <span
+        <Text style={{ flex: 1, color: colors.muted2, fontSize: 16 }}>Anota algo en un susurro…</Text>
+        <View
           style={{
             width: 42,
             height: 42,
-            borderRadius: '50%',
-            background: '#A7D8B6',
-            display: 'flex',
+            borderRadius: 21,
+            backgroundColor: colors.green,
             alignItems: 'center',
             justifyContent: 'center',
-            flexShrink: 0,
           }}
         >
-          <MicIcon />
-        </span>
-      </div>
-    </div>
+          <MicIcon size={22} color={colors.bg} />
+        </View>
+      </Pressable>
+    </View>
   )
 }

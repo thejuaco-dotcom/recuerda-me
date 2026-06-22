@@ -2,58 +2,68 @@
 
 > Recordatorios que llegan a ti, en vez de esperarte en una lista.
 
-**Cerca** es una app de recordatorios con un alma calmada: te susurra, no te grita. Capturas en 2 segundos escribiendo en lenguaje natural y la app entiende el contexto, el lugar, el momento y la insistencia por ti.
+**Cerca** es una app de recordatorios con un alma calmada: te susurra, no te grita. Capturas en 2 segundos escribiendo en lenguaje natural y la app entiende el contexto, el lugar y el momento por ti — y, si algo importa de verdad, insiste hasta que lo confirmas.
 
-Esta es la implementación en React + Vite + TypeScript del prototipo interactivo **"Cerca"** exportado desde Claude Design.
+App **nativa (iOS/Android)** hecha con **Expo / React Native + TypeScript**. Los recordatorios se guardan **en el dispositivo** y los avisos son **notificaciones reales del sistema**.
+
+## Qué hace de verdad
+
+- **Persistencia local** — tus recordatorios sobreviven a cerrar la app (AsyncStorage).
+- **Captura en lenguaje natural** — escribe `comprar pan al volver a casa` y la app deduce contexto (Compras), ubicación (al llegar a casa) e insistencia. Eliges cuándo te avisa con un toque.
+- **Notificaciones reales** — `expo-notifications` programa un aviso del sistema a la hora elegida. Marcar hecho lo cancela; posponer lo reprograma 10 min.
+- **Aviso insistente** — los recordatorios importantes abren una pantalla de confirmación con anillo **mantén-para-confirmar**; al tocar la notificación se abre directamente.
+- **Gestión** — marca hecho, reabre, o borra con pulsación larga, organizado por contexto.
 
 ## Pantallas
 
-- **Inicio — "Cerca de ti"** · Un campo de burbujas con tus 5 contextos (Casa, Trabajo, Compras, Personal, Ciudad). La burbuja activa respira. Arriba, un banner _"Ahora cerca"_ con lo siguiente y un aviso pendiente.
-- **Contexto** · Los recordatorios que viven en un lugar. Toca uno para marcarlo hecho; el punto de color indica si depende de ubicación (verde), insiste (ámbar) o es libre (gris).
-- **Captura** · Escribe una frase y _míralo entenderse solo_: la app extrae contexto, ubicación, cuándo e insistencia en vivo mientras escribes.
-- **Aviso insistente** · Un overlay de pantalla bloqueada para lo que importa de verdad. _Mantén pulsado_ el anillo para confirmar — no se va hasta que lo cierres.
+- **Inicio "Cerca de ti"** — mapa de burbujas con tus 5 contextos (la burbuja activa respira), banner _"Ahora cerca"_ y bandeja de avisos.
+- **Contexto** — los recordatorios que viven en un lugar.
+- **Captura** — lenguaje natural + selector de "¿cuándo te aviso?".
+- **Aviso** — confirmación insistente a pantalla completa.
 
-### Pruébalo
+## Cómo probarla
 
-Escribe en la captura cosas como:
+Necesitas [Node.js](https://nodejs.org) 18+ y la app **Expo Go** en tu móvil ([iOS](https://apps.apple.com/app/expo-go/id982107779) · [Android](https://play.google.com/store/apps/details?id=host.exp.exponent)).
 
-- `llamar al banco mañana`
-- `comprar leche en el súper`
-- `sacar la basura, importante`
+```bash
+npm install
+npx expo start
+```
 
-…y abre el aviso (botón **"1 aviso"** arriba a la derecha) para confirmarlo manteniéndolo pulsado.
+Escanea el QR que aparece en la terminal con **Expo Go** (Android) o la **cámara** (iOS). La app se abre en tu teléfono. Acepta el permiso de notificaciones para que los avisos con hora funcionen de verdad.
 
-## Stack
+> Las **notificaciones locales** funcionan en Expo Go. Para avisos por **ubicación real** (geofencing) y push remoto hace falta un _development build_ (`npx expo run:ios` / `run:android` o EAS), un paso natural más adelante.
 
-- [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
-- [Vite](https://vite.dev/) para el dev server y el build
-- Tipografías: [Newsreader](https://fonts.google.com/specimen/Newsreader) (los momentos) · [Hanken Grotesk](https://fonts.google.com/specimen/Hanken+Grotesk) (la interfaz)
-- Sin dependencias de UI: el frame de iOS y todos los glifos están dibujados a mano para fidelidad pixel-perfect con el diseño.
+### Pruébalo en 30 segundos
+
+1. Toca la barra **"Anota algo en un susurro…"**.
+2. Escribe `sacar la basura, importante` y elige **En 1 h** (o **Elegir…** para una hora exacta).
+3. Guárdalo → aparece en **Casa** y verás **"1 aviso"** arriba; tócalo y **mantén pulsado** el círculo para confirmarlo.
 
 ## Estructura
 
 ```
+App.tsx                  Carga de fuentes/datos, permisos y notificaciones, navegación
 src/
-  App.tsx              Marco exterior (título, intro, pie)
-  CercaApp.tsx         Estado y lógica de la app dentro del dispositivo
-  parseDraft.ts        Lectura de lenguaje natural → contexto/lugar/cuándo/insiste
-  data.ts              Contextos y recordatorios iniciales
-  types.ts             Tipos del modelo
+  types.ts               Modelo (Reminder con dueAt + notifId)
+  data.ts                Contextos y datos semilla
+  parseDraft.ts          Lenguaje natural → contexto/lugar/cuándo/insiste
+  storage.ts             Persistencia local (AsyncStorage)
+  notifications.ts       Programar/cancelar notificaciones del sistema
+  theme.ts               Paleta y tipografías
+  icons.tsx              Iconos SVG
   components/
-    IOSDevice.tsx      Frame de iOS (bisel, Dynamic Island, barra de estado)
-    icons.tsx          Glifos CSS reutilizables (micrófono, pin…)
+    BreathingHalo.tsx    Halo que respira tras la burbuja activa
+    HoldRing.tsx         Anillo mantener-para-confirmar (SVG animado)
   screens/
-    HomeScreen.tsx     Inicio "Cerca de ti"
-    ContextScreen.tsx  Recordatorios de un contexto
-    CaptureScreen.tsx  Captura en lenguaje natural
-    NotifOverlay.tsx   Aviso insistente con mantener-para-confirmar
+    HomeScreen.tsx       Mapa de burbujas
+    ContextScreen.tsx    Recordatorios de un contexto
+    CaptureScreen.tsx    Captura + selector de hora
+    NotifScreen.tsx      Aviso insistente
 ```
 
-## Desarrollo
+## Stack
 
-```bash
-npm install
-npm run dev      # arranca el dev server
-npm run build    # type-check + build de producción a dist/
-npm run preview  # sirve el build de producción
-```
+- [Expo](https://expo.dev) SDK 56 · [React Native](https://reactnative.dev) · [TypeScript](https://www.typescriptlang.org/)
+- `expo-notifications`, `@react-native-async-storage/async-storage`, `react-native-svg`, `expo-linear-gradient`, `expo-haptics`
+- Tipografías [Newsreader](https://fonts.google.com/specimen/Newsreader) (los momentos) + [Hanken Grotesk](https://fonts.google.com/specimen/Hanken+Grotesk) (la interfaz)

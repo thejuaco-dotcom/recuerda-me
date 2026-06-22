@@ -1,4 +1,4 @@
-import type { ContextId, ContextMeta, RemindersByContext } from './types'
+import type { ContextId, ContextMeta, Reminder } from './types'
 
 export const META: Record<ContextId, ContextMeta> = {
   casa: { label: 'Casa', top: 0, left: 4, size: 150, emphasis: true },
@@ -10,27 +10,30 @@ export const META: Record<ContextId, ContextMeta> = {
 
 export const ORDER: ContextId[] = ['casa', 'trabajo', 'compras', 'personal', 'ciudad']
 
-export const INITIAL_DATA: RemindersByContext = {
-  casa: [
-    { id: 'c1', text: 'Regar las plantas', trigger: 'al llegar a casa', loc: true, done: false },
-    { id: 'c2', text: 'Sacar la basura', trigger: 'hoy 20:30 · insiste', insist: true, done: false },
-    { id: 'c3', text: 'Llamar al portero', trigger: 'esta tarde', done: false },
-  ],
-  trabajo: [
-    { id: 't1', text: 'Enviar el informe', trigger: 'al llegar a la oficina', loc: true, done: false },
-    { id: 't2', text: 'Responder a Marta', trigger: 'antes de las 11', done: false },
-  ],
-  compras: [
-    { id: 's1', text: 'Comprar pan', trigger: 'de camino a casa', loc: true, done: false },
-    { id: 's2', text: 'Leche y huevos', trigger: 'en el súper', loc: true, done: false },
-    { id: 's3', text: 'Pilas AA', trigger: 'cuando pases', done: false },
-    { id: 's4', text: 'Regalo de Ana', trigger: 'esta semana', done: false },
-    { id: 's5', text: 'Bombillas', trigger: 'en la ferretería', loc: true, done: false },
-  ],
-  personal: [
-    { id: 'p1', text: 'Meditar 5 min', trigger: 'cada mañana · racha 8', done: false },
-  ],
-  ciudad: [
-    { id: 'u1', text: 'Recoger receta', trigger: 'al pasar por la farmacia', loc: true, done: false },
-  ],
+/** Seed data, only used the very first time the app opens (before storage). */
+export function seedReminders(): Reminder[] {
+  const base = (
+    partial: Omit<Reminder, 'createdAt' | 'dueAt' | 'notifId' | 'done'> & Partial<Reminder>,
+  ): Reminder => ({
+    done: false,
+    createdAt: Date.now(),
+    dueAt: null,
+    notifId: null,
+    ...partial,
+  })
+
+  return [
+    base({ id: 'c1', contextId: 'casa', text: 'Regar las plantas', trigger: 'al llegar a casa', loc: true }),
+    base({ id: 'c2', contextId: 'casa', text: 'Sacar la basura', trigger: 'hoy 20:30 · insiste', insist: true }),
+    base({ id: 'c3', contextId: 'casa', text: 'Llamar al portero', trigger: 'esta tarde' }),
+    base({ id: 't1', contextId: 'trabajo', text: 'Enviar el informe', trigger: 'al llegar a la oficina', loc: true }),
+    base({ id: 't2', contextId: 'trabajo', text: 'Responder a Marta', trigger: 'antes de las 11' }),
+    base({ id: 's1', contextId: 'compras', text: 'Comprar pan', trigger: 'de camino a casa', loc: true }),
+    base({ id: 's2', contextId: 'compras', text: 'Leche y huevos', trigger: 'en el súper', loc: true }),
+    base({ id: 's3', contextId: 'compras', text: 'Pilas AA', trigger: 'cuando pases' }),
+    base({ id: 's4', contextId: 'compras', text: 'Regalo de Ana', trigger: 'esta semana' }),
+    base({ id: 's5', contextId: 'compras', text: 'Bombillas', trigger: 'en la ferretería', loc: true }),
+    base({ id: 'p1', contextId: 'personal', text: 'Meditar 5 min', trigger: 'cada mañana · racha 8' }),
+    base({ id: 'u1', contextId: 'ciudad', text: 'Recoger receta', trigger: 'al pasar por la farmacia', loc: true }),
+  ]
 }

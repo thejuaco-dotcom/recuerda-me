@@ -1,24 +1,33 @@
 {
-  "name": "recuerda-me",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "description": "Cerca — recordatorios que llegan a ti, en vez de esperarte en una lista.",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "lint": "tsc -b --noEmit"
-  },
+  "name": "cerca",
+  "version": "1.0.0",
+  "main": "index.ts",
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@expo-google-fonts/hanken-grotesk": "^0.4.3",
+    "@expo-google-fonts/newsreader": "^0.4.1",
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-community/datetimepicker": "^9.1.0",
+    "expo": "~56.0.12",
+    "expo-device": "~56.0.4",
+    "expo-font": "~56.0.7",
+    "expo-haptics": "~56.0.3",
+    "expo-linear-gradient": "~56.0.4",
+    "expo-notifications": "~56.0.18",
+    "expo-status-bar": "~56.0.4",
+    "react": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "^15.15.4"
   },
   "devDependencies": {
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.11"
-  }
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "private": true
 }
