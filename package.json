@@ -5,23 +5,23 @@
   "dependencies": {
     "@expo-google-fonts/hanken-grotesk": "^0.4.3",
     "@expo-google-fonts/newsreader": "^0.4.1",
-    "@react-native-async-storage/async-storage": "^2.2.0",
-    "@react-native-community/datetimepicker": "^9.1.0",
-    "expo": "~56.0.12",
-    "expo-device": "~56.0.4",
-    "expo-font": "~56.0.7",
-    "expo-haptics": "~56.0.3",
-    "expo-linear-gradient": "~56.0.4",
-    "expo-notifications": "~56.0.18",
-    "expo-status-bar": "~56.0.4",
-    "react": "19.2.3",
-    "react-native": "0.85.3",
-    "react-native-safe-area-context": "~5.7.0",
-    "react-native-svg": "^15.15.4"
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/datetimepicker": "8.6.0",
+    "expo": "55.0.26",
+    "expo-device": "~55.0.17",
+    "expo-font": "~55.0.8",
+    "expo-haptics": "~55.0.14",
+    "expo-linear-gradient": "~55.0.14",
+    "expo-notifications": "~55.0.23",
+    "expo-status-bar": "~55.0.6",
+    "react": "19.2.0",
+    "react-native": "0.83.6",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-svg": "15.15.3"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
-    "typescript": "~6.0.3"
+    "typescript": "~5.9.2"
   },
   "scripts": {
     "start": "expo start",
